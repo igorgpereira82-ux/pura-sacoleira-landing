@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 
 const WHATSAPP_LINK = "https://wa.me/557399123452";
-const APP_LINK = "https://purasacoleira.com.br";
+const APP_LINK = "https://app.purasacoleira.com.br";
 
 /* ─── Animated counter hook ─── */
 function useCounter(end, duration = 2000, startOn = true) {
