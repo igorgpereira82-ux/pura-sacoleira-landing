@@ -237,7 +237,7 @@ button{cursor:pointer;border:none;outline:none}
 // ═══════════════════════════════════════════
 // CONFIG & STATE
 // ═══════════════════════════════════════════
-let supabase = null;
+let sbClient = null;
 let adminPin = '';
 let users = [];
 let currentFilter = 'todos';
@@ -313,7 +313,7 @@ function engScore(u) {
 // AUTH & DATA
 // ═══════════════════════════════════════════
 function initSupabase(url, key) {
-  supabase = window.supabase.createClient(url, key);
+  sbClient = window.supabase.createClient(url, key);
 }
 
 async function doLogin() {
@@ -329,7 +329,7 @@ async function doLogin() {
   
   try {
     initSupabase(url, key);
-    const {data,error} = await supabase.rpc('crm_get_all_profiles',{admin_pin:pin});
+    const {data,error} = await sbClient.rpc('crm_get_all_profiles',{admin_pin:pin});
     if (error) throw error;
     
     adminPin = pin;
@@ -357,7 +357,7 @@ function doLogout() {
 
 async function loadData() {
   try {
-    const {data,error} = await supabase.rpc('crm_get_all_profiles',{admin_pin:adminPin});
+    const {data,error} = await sbClient.rpc('crm_get_all_profiles',{admin_pin:adminPin});
     if(error) throw error;
     users = data.map(u=>({...u,receita_total:Number(u.receita_total)||0,total_vendas:Number(u.total_vendas)||0,total_clientes:Number(u.total_clientes)||0,total_produtos:Number(u.total_produtos)||0,meta_mensal:Number(u.meta_mensal)||0,plano_valor:Number(u.plano_valor)||0}));
     renderAll();
@@ -366,7 +366,7 @@ async function loadData() {
 
 async function savePlan(userId, planData) {
   try {
-    const {data,error} = await supabase.rpc('crm_update_plan',{
+    const {data,error} = await sbClient.rpc('crm_update_plan',{
       admin_pin: adminPin,
       target_user_id: userId,
       new_plano_liberado: planData.plano_liberado,
