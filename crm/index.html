@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#7c1d3e">
+<title>Pura Sacoleira — CRM Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='28' font-size='28'>🛍️</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--wine:#7c1d3e;--wine-lt:#fdf2f8;--dark:#1c1917;--warm:#fafaf9;--border:#e7e5e4;--muted:#a8a29e;--text:#292524;--green:#059669;--red:#ef4444;--amber:#f59e0b;--radius:14px}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--warm);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+input,textarea,select,button{font-family:inherit}
+button{cursor:pointer;border:none;outline:none}
+.hide{display:none!important}
+
+/* LOGIN */
+#loginScreen{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--wine) 0%,#4a0e25 100%);padding:24px}
+.login-card{background:#fff;border-radius:24px;padding:36px 28px;width:100%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.login-card h1{font-size:15px;color:var(--wine);font-weight:800;letter-spacing:.5px;margin-top:8px}
+.login-card .emoji{font-size:48px;margin-bottom:4px}
+.login-card .sub{font-size:12px;color:var(--muted);margin-top:4px}
+.login-input{width:100%;padding:14px;border-radius:12px;border:1.5px solid var(--border);font-size:15px;outline:none;margin-top:16px;transition:border .2s}
+.login-input:focus{border-color:var(--wine)}
+.login-btn{width:100%;padding:15px;background:var(--wine);color:#fff;border-radius:12px;font-size:15px;font-weight:700;margin-top:12px;transition:opacity .2s}
+.login-btn:active{opacity:.8}
+.login-error{color:var(--red);font-size:12px;margin-top:8px;font-weight:600}
+.login-setup{margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.login-setup label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:block;text-align:left;margin-bottom:4px}
+
+/* APP */
+#app{display:none}
+.header{background:var(--wine);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50}
+.header h1{color:#fff;font-size:16px;font-weight:800}
+.header .info{display:flex;align-items:center;gap:8px}
+.header .dot{width:6px;height:6px;border-radius:50%;background:#4ade80}
+.header small{color:rgba(255,255,255,.4);font-size:10px}
+.header .logout{background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600}
+
+.container{max-width:900px;margin:0 auto;padding:14px 12px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px}
+.stat{background:#fff;border-radius:12px;border:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:10px}
+.stat .icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.stat .val{font-size:22px;font-weight:800;color:var(--dark);line-height:1}
+.stat .lbl{font-size:10px;color:var(--muted);font-weight:500}
+
+/* Alert */
+.alert{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid var(--amber);border-radius:12px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.alert .t{font-size:12px;font-weight:700;color:#92400e}
+.alert .d{font-size:11px;color:#a16207}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;border:1.5px solid var(--border);background:#fff;color:var(--muted);flex-shrink:0;transition:all .15s}
+.tab.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+
+/* Search */
+.search-row{display:flex;gap:6px;margin-bottom:10px}
+.search-row input{flex:1;padding:8px 12px;border-radius:10px;border:1px solid var(--border);font-size:13px;outline:none}
+.search-row select{padding:8px;border-radius:10px;border:1px solid var(--border);font-size:12px;outline:none;background:#fff}
+
+/* Table / Cards */
+.user-list{display:flex;flex-direction:column;gap:8px}
+.user-card{background:#fff;border-radius:14px;border:1px solid var(--border);padding:14px 16px;cursor:pointer;transition:box-shadow .15s}
+.user-card:active{box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.user-card .top{display:flex;justify-content:space-between;align-items:flex-start}
+.user-card .name{font-size:14px;font-weight:700;color:var(--dark)}
+.user-card .email{font-size:11px;color:var(--muted);margin-top:1px}
+.user-card .badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.user-card .row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid #f5f5f4}
+.user-card .metric{text-align:center}
+.user-card .metric .v{font-size:15px;font-weight:800;color:var(--dark)}
+.user-card .metric .l{font-size:9px;color:var(--muted);font-weight:600}
+.user-card .actions{display:flex;gap:6px;margin-top:10px}
+.user-card .actions button{flex:1;padding:9px;border-radius:10px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px}
+
+.badge{display:inline-flex;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+
+.eng-bar{display:flex;align-items:center;gap:6px}
+.eng-bar .track{width:40px;height:4px;background:#e7e5e4;border-radius:2px;overflow:hidden}
+.eng-bar .fill{height:100%;border-radius:2px}
+.eng-bar span{font-size:10px;color:var(--muted);font-weight:700}
+
+/* Modal Overlay */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{background:var(--warm);border-radius:20px 20px 0 0;width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-header{padding:18px 20px;background:var(--wine);border-radius:20px 20px 0 0;position:sticky;top:0;z-index:1}
+.modal-header h3{color:#fff;font-size:16px;font-weight:800}
+.modal-header .sub{color:rgba(255,255,255,.4);font-size:11px;margin-top:2px}
+.modal-header .close{position:absolute;right:16px;top:16px;background:none;color:rgba(255,255,255,.4);font-size:20px}
+.modal-body{padding:20px}
+
+/* Plan Modal */
+.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.plan-card{padding:16px 12px;border-radius:14px;text-align:center;border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .15s}
+.plan-card.selected{border-color:var(--wine);background:var(--wine-lt);transform:scale(1.02)}
+.plan-card .ic{font-size:28px}
+.plan-card .nm{font-size:13px;font-weight:800;color:var(--dark);margin-top:4px}
+.plan-card .pr{font-size:16px;font-weight:800;margin-top:2px}
+.plan-card .lim{font-size:9px;color:var(--muted);margin-top:3px}
+
+.duration-row{display:flex;gap:6px;margin-bottom:14px}
+.dur-btn{flex:1;padding:10px 6px;border-radius:10px;font-size:12px;font-weight:700;border:1.5px solid var(--border);background:#fff;color:var(--muted)}
+.dur-btn.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+
+.pay-methods{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px}
+.pay-btn{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--muted)}
+.pay-btn.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+
+.confirm-pay{display:flex;align-items:center;gap:12px;padding:16px;border-radius:14px;width:100%;border:2px dashed #d6d3d1;background:#fff;margin-bottom:16px;transition:all .2s}
+.confirm-pay.confirmed{border:2.5px solid var(--green);background:#ecfdf5}
+.confirm-pay .check{font-size:28px}
+.confirm-pay .txt{text-align:left}
+.confirm-pay .txt .title{font-size:14px;font-weight:700}
+.confirm-pay .txt .desc{font-size:11px;color:var(--muted);margin-top:1px}
+
+.summary{border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;line-height:1.8}
+.summary.ok{background:#ecfdf5;border:1.5px solid #a7f3d0}
+.summary.pending{background:#fffbeb;border:1.5px solid #fde68a}
+
+.sql-box{background:var(--dark);border-radius:12px;padding:14px;margin-top:16px}
+.sql-box pre{font-size:11px;color:#4ade80;font-family:'Courier New',monospace;white-space:pre-wrap;line-height:1.5}
+.sql-box .copy-btn{font-size:10px;padding:3px 10px;border-radius:6px;font-weight:700}
+
+.action-btn{width:100%;padding:14px;border-radius:12px;font-size:14px;font-weight:700;margin-top:4px;transition:opacity .15s}
+.action-btn:active{opacity:.8}
+
+.section-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+
+.notes-input{width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);font-size:13px;min-height:50px;resize:vertical;outline:none}
+
+/* Loading */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+
+/* WhatsApp templates */
+.tpl-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+.tpl-btn{padding:5px 10px;border-radius:16px;font-size:10px;font-weight:700;border:1.5px solid var(--border);background:#fff;color:var(--muted)}
+.tpl-btn.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.msg-area{width:100%;min-height:130px;padding:12px;border-radius:10px;border:1px solid var(--border);font-size:13px;line-height:1.5;resize:vertical;outline:none}
+</style>
+</head>
+<body>
+
+<!-- ═══════ LOGIN SCREEN ═══════ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="emoji">🛍️</div>
+    <h1>PURA SACOLEIRA</h1>
+    <div class="sub">CRM Admin — Acesso Restrito</div>
+    
+    <div id="setupSection" class="login-setup">
+      <label>Supabase URL</label>
+      <input class="login-input" id="inputUrl" type="url" placeholder="https://xxx.supabase.co" style="margin-top:0;margin-bottom:10px">
+      <label>Anon Key</label>
+      <input class="login-input" id="inputKey" type="text" placeholder="eyJhbGciOiJI..." style="margin-top:0">
+    </div>
+    
+    <input class="login-input" id="inputPin" type="password" inputmode="numeric" placeholder="PIN de Admin" maxlength="10">
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">🔐 Entrar no CRM</button>
+    <div class="login-error hide" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ═══════ MAIN APP ═══════ -->
+<div id="app">
+  <div class="header">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:20px">🛍️</span>
+      <div>
+        <h1>Pura Sacoleira</h1>
+        <div style="color:rgba(255,255,255,.35);font-size:10px">CRM Admin</div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="dot"></div>
+      <small id="userCount">0</small>
+      <button class="logout" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="stats" id="statsGrid"></div>
+    <div id="alertBanner" class="hide"></div>
+    <div class="tabs" id="tabsRow"></div>
+    <div class="search-row">
+      <input type="text" placeholder="🔍 Buscar vendedora..." id="searchInput" oninput="renderList()">
+      <select id="sortSelect" onchange="renderList()">
+        <option value="recent">Recentes</option>
+        <option value="engagement">Engajamento</option>
+        <option value="revenue">Receita</option>
+        <option value="expiry">Vencimento</option>
+      </select>
+      <button onclick="loadData()" style="background:var(--wine);color:#fff;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700">🔄</button>
+    </div>
+    <div class="user-list" id="userList"></div>
+    <div style="text-align:center;padding:16px;font-size:10px;color:#d6d3d1" id="footer"></div>
+  </div>
+</div>
+
+<!-- ═══════ MODALS ═══════ -->
+<div class="modal-overlay hide" id="planModal" onclick="closePlanModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <button class="close" onclick="closePlanModal()">✕</button>
+      <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:600;text-transform:uppercase;letter-spacing:1px" id="planModalLabel">Gestão de Plano</div>
+      <h3 id="planModalName"></h3>
+      <div class="sub" id="planModalEmail"></div>
+    </div>
+    <div class="modal-body" id="planModalBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay hide" id="msgModal" onclick="closeMsgModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header" style="background:#25D366">
+      <button class="close" onclick="closeMsgModal()">✕</button>
+      <h3 id="msgModalName">💬 Mensagem</h3>
+      <div class="sub" id="msgModalPhone"></div>
+    </div>
+    <div class="modal-body" id="msgModalBody"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════════════
+let supabase = null;
+let adminPin = '';
+let users = [];
+let currentFilter = 'todos';
+let currentPlanUser = null;
+
+const TRIAL_DAYS = 14;
+const PLANS = {
+  gratuito: { key:'gratuito', name:'Gratuito', price:0, icon:'🆓', color:'#78716c', bg:'#f5f5f4', limits:'3 clientes · 10 vendas/mês', features:['Até 3 clientes','Até 10 vendas/mês','Controle de estoque'], noFeatures:['Relatórios','Lembretes WhatsApp','Suporte prioritário'] },
+  premium: { key:'premium', name:'Premium', price:29.90, icon:'👑', color:'#7c1d3e', bg:'#fdf2f8', limits:'Tudo ilimitado', tag:'RECOMENDADO', features:['Clientes ilimitados','Vendas ilimitadas','Controle de estoque','Relatórios completos','Lembretes WhatsApp','Suporte prioritário','Parcelamento de vendas'], noFeatures:[] }
+};
+const PAY_METHODS = [{key:'pix',label:'PIX',icon:'📱'},{key:'transferencia',label:'Transferência',icon:'🏦'},{key:'dinheiro',label:'Dinheiro',icon:'💵'}];
+
+const TPL = {
+  welcome: n => `Oi ${n}! 👋 Seja bem-vinda ao *Pura Sacoleira*! 🛍️\n\nVocê tem *${TRIAL_DAYS} dias grátis* pra testar tudo!\n\nPrecisa de ajuda? É só chamar! 💚`,
+  trial_feedback: n => `Oi ${n}! 😊\n\nComo tá sendo sua experiência com o Pura Sacoleira? Tá conseguindo usar?\n\nQualquer dúvida, manda aqui! 💬`,
+  trial_vencendo: (n,d) => `Oi ${n}! ⏰\n\nSeu teste grátis termina em *${d} dias*!\n\nAssine o Premium por *R$ 29,90/mês*.\n\n💳 Pagamento via Pix!\n\nQuer assinar? 💚`,
+  trial_vencido: n => `Oi ${n}! 💛\n\nSeu teste grátis terminou, mas *seus dados estão salvos*!\n\nDesbloqueie tudo com o Premium por *R$ 29,90/mês*.\n\nQuer ativar? 😊`,
+  reengajar: n => `Oi ${n}! 💜\n\nFaz um tempinho que você não entra no Pura Sacoleira.\n\nSeu caderninho tá te esperando! 📒✨`,
+  premium_ativado: n => `Oi ${n}! 🎉\n\nSeu plano *Premium* foi ativado com sucesso! 👑\n\nAproveite tudo ilimitado! 💚🛍️`,
+  renovacao: (n,d) => `Oi ${n}! 🔄\n\nSeu plano Premium renova em *${d} dias*.\n\nGaranta a renovação! 💚`,
+  plano_vencido: n => `Oi ${n}! ⚠️\n\nSeu plano Premium venceu!\n\nRenove por *R$ 29,90/mês* e continue com tudo. 💚`,
+};
+const TPL_LIST = [
+  {k:'welcome',l:'👋 Boas-vindas'},{k:'trial_feedback',l:'💬 Feedback'},
+  {k:'trial_vencendo',l:'⏰ Vencendo'},{k:'trial_vencido',l:'⛔ Vencido'},
+  {k:'reengajar',l:'💜 Reengajar'},{k:'premium_ativado',l:'🎉 Ativado'},
+  {k:'renovacao',l:'🔄 Renovar'},{k:'plano_vencido',l:'🔴 Expirado'}
+];
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+const NOW = new Date();
+const daysBtw = (a,b) => (new Date(b)-new Date(a))/864e5;
+const dFrom = d => !d?null:Math.ceil((new Date(d)-NOW)/864e5);
+const fmt = d => !d?'—':new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+const fmtCur = v => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+const fPhone = p => {if(!p)return'';const d=p.replace(/\D/g,'');return d.startsWith('55')?d:'55'+d;};
+
+function classify(u) {
+  const dc=(NOW-new Date(u.created_at))/864e5;
+  const te=u.trial_expira_em?new Date(u.trial_expira_em):null;
+  const dt=te?(te-NOW)/864e5:null;
+  const dl=(NOW-new Date(u.last_sign_in_at))/864e5;
+  const act=u.total_vendas>0||u.total_clientes>2||u.total_produtos>3;
+  const paid=u.plano_liberado==='premium'&&u.pagamento_confirmado;
+  if(paid){
+    const pe=u.plano_fim?new Date(u.plano_fim):null;
+    const dp=pe?(pe-NOW)/864e5:null;
+    if(dp!==null&&dp<=0) return {s:'plano_vencido',l:'Plano Vencido',c:'#dc2626',bg:'#fef2f2',i:'🔴'};
+    if(dp!==null&&dp<=7) return {s:'renovacao',l:'Renovação',c:'#ea580c',bg:'#fff7ed',i:'🔄'};
+    return {s:'premium',l:'Premium',c:'#7c1d3e',bg:'#fdf2f8',i:'👑'};
+  }
+  if(te&&te<NOW) return {s:'trial_vencido',l:'Trial Vencido',c:'#ef4444',bg:'#fef2f2',i:'⛔'};
+  if(dt!==null&&dt<=5&&dt>0) return {s:'trial_vencendo',l:`Trial ${Math.ceil(dt)}d`,c:'#f59e0b',bg:'#fffbeb',i:'⚠️'};
+  if(dc<=2) return {s:'novo',l:'Nova',c:'#10b981',bg:'#ecfdf5',i:'🆕'};
+  if(dl>5&&!act) return {s:'inativo',l:'Inativo',c:'#9ca3af',bg:'#f3f4f6',i:'💤'};
+  if(act) return {s:'engajado',l:'Engajado',c:'#3b82f6',bg:'#eff6ff',i:'🔥'};
+  return {s:'free',l:'Gratuito',c:'#78716c',bg:'#f5f5f4',i:'🆓'};
+}
+
+function engScore(u) {
+  let s=0;
+  if(u.total_vendas>0)s+=25;if(u.total_vendas>10)s+=20;
+  if(u.total_clientes>0)s+=15;if(u.total_clientes>10)s+=10;
+  if(u.total_produtos>0)s+=10;if(u.total_produtos>10)s+=5;
+  const d=(NOW-new Date(u.last_sign_in_at))/864e5;
+  if(d<1)s+=15;else if(d<3)s+=8;else if(d<7)s+=3;
+  return Math.min(s,100);
+}
+
+// ═══════════════════════════════════════════
+// AUTH & DATA
+// ═══════════════════════════════════════════
+function initSupabase(url, key) {
+  supabase = window.supabase.createClient(url, key);
+}
+
+async function doLogin() {
+  const url = document.getElementById('inputUrl').value.trim();
+  const key = document.getElementById('inputKey').value.trim();
+  const pin = document.getElementById('inputPin').value.trim();
+  const err = document.getElementById('loginError');
+  err.classList.add('hide');
+  
+  if (!url||!key||!pin) { err.textContent='Preencha todos os campos';err.classList.remove('hide');return; }
+  
+  document.getElementById('loginBtn').innerHTML='<span class="spinner"></span> Verificando...';
+  
+  try {
+    initSupabase(url, key);
+    const {data,error} = await supabase.rpc('crm_get_all_profiles',{admin_pin:pin});
+    if (error) throw error;
+    
+    adminPin = pin;
+    users = data.map(u=>({...u,receita_total:Number(u.receita_total)||0,total_vendas:Number(u.total_vendas)||0,total_clientes:Number(u.total_clientes)||0,total_produtos:Number(u.total_produtos)||0,meta_mensal:Number(u.meta_mensal)||0,plano_valor:Number(u.plano_valor)||0}));
+    
+    // Salvar config (sem PIN)
+    try{localStorage.setItem('crm_url',url);localStorage.setItem('crm_key',key);}catch(e){}
+    
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='block';
+    renderAll();
+  } catch(e) {
+    err.textContent = e.message?.includes('PIN')?'PIN inválido':'Erro de conexão. Verifique URL e Key.';
+    err.classList.remove('hide');
+  }
+  document.getElementById('loginBtn').innerHTML='🔐 Entrar no CRM';
+}
+
+function doLogout() {
+  document.getElementById('app').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('inputPin').value='';
+  adminPin='';users=[];
+}
+
+async function loadData() {
+  try {
+    const {data,error} = await supabase.rpc('crm_get_all_profiles',{admin_pin:adminPin});
+    if(error) throw error;
+    users = data.map(u=>({...u,receita_total:Number(u.receita_total)||0,total_vendas:Number(u.total_vendas)||0,total_clientes:Number(u.total_clientes)||0,total_produtos:Number(u.total_produtos)||0,meta_mensal:Number(u.meta_mensal)||0,plano_valor:Number(u.plano_valor)||0}));
+    renderAll();
+  } catch(e) { alert('Erro ao carregar: '+e.message); }
+}
+
+async function savePlan(userId, planData) {
+  try {
+    const {data,error} = await supabase.rpc('crm_update_plan',{
+      admin_pin: adminPin,
+      target_user_id: userId,
+      new_plano_liberado: planData.plano_liberado,
+      new_plano_valor: planData.plano_valor,
+      new_plano_inicio: planData.plano_inicio,
+      new_plano_fim: planData.plano_fim,
+      new_pagamento_confirmado: planData.pagamento_confirmado,
+      new_pagamento_metodo: planData.pagamento_metodo,
+      new_notas_admin: planData.notas_admin||''
+    });
+    if(error) throw error;
+    await loadData();
+    return true;
+  } catch(e) { alert('Erro ao salvar: '+e.message); return false; }
+}
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function renderAll() {
+  renderStats();
+  renderTabs();
+  renderList();
+  document.getElementById('userCount').textContent=users.length+' vendedoras';
+  document.getElementById('footer').textContent=`Pura Sacoleira CRM · ${users.length} vendedoras · Trial ${TRIAL_DAYS}d · Premium R$ 29,90`;
+}
+
+function renderStats() {
+  const enriched = users.map(u=>({...u,cl:classify(u)}));
+  const s = {
+    total:enriched.length,
+    novos:enriched.filter(u=>u.cl.s==='novo').length,
+    vencendo:enriched.filter(u=>u.cl.s==='trial_vencendo').length,
+    vencidos:enriched.filter(u=>u.cl.s==='trial_vencido').length,
+    premium:enriched.filter(u=>['premium','renovacao','plano_vencido'].includes(u.cl.s)).length,
+    mrr:enriched.reduce((a,u)=>a+(u.pagamento_confirmado&&u.plano_liberado==='premium'?29.9:0),0)
+  };
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat"><div class="icon" style="background:#eff6ff">👥</div><div><div class="lbl">Vendedoras</div><div class="val">${s.total}</div></div></div>
+    <div class="stat"><div class="icon" style="background:#ecfdf5">🆕</div><div><div class="lbl">Novas</div><div class="val">${s.novos}</div></div></div>
+    <div class="stat"><div class="icon" style="background:#fffbeb">⚠️</div><div><div class="lbl">Vencendo</div><div class="val">${s.vencendo}</div></div></div>
+    <div class="stat"><div class="icon" style="background:#fdf2f8">👑</div><div><div class="lbl">Premium</div><div class="val">${s.premium}</div></div></div>
+    <div class="stat"><div class="icon" style="background:#f5f3ff">💰</div><div><div class="lbl">MRR</div><div class="val">${fmtCur(s.mrr)}</div></div></div>
+  `;
+  const ab = document.getElementById('alertBanner');
+  if(s.vencendo>0||s.vencidos>0){
+    ab.classList.remove('hide');
+    ab.className='alert';
+    ab.innerHTML=`<span style="font-size:17px">🔔</span><div style="flex:1"><div class="t">Ações pendentes</div><div class="d">${s.vencendo>0?s.vencendo+' vencendo. ':''}${s.vencidos>0?s.vencidos+' vencidos.':''}</div></div><button onclick="currentFilter='trial_vencendo';renderTabs();renderList()" style="background:var(--amber);color:#fff;padding:7px 12px;border-radius:8px;font-size:11px;font-weight:700">Ver →</button>`;
+  } else ab.classList.add('hide');
+}
+
+function renderTabs() {
+  const enriched = users.map(u=>({...u,cl:classify(u)}));
+  const counts = {
+    todos:enriched.length,
+    novo:enriched.filter(u=>u.cl.s==='novo').length,
+    engajado:enriched.filter(u=>u.cl.s==='engajado').length,
+    trial_vencendo:enriched.filter(u=>u.cl.s==='trial_vencendo').length,
+    trial_vencido:enriched.filter(u=>u.cl.s==='trial_vencido').length,
+    premium_all:enriched.filter(u=>['premium','renovacao','plano_vencido'].includes(u.cl.s)).length,
+    inativo:enriched.filter(u=>u.cl.s==='inativo').length,
+  };
+  const tabs=[
+    {k:'todos',l:'Todos'},{k:'novo',l:'🆕 Novas'},{k:'engajado',l:'🔥 Engajadas'},
+    {k:'trial_vencendo',l:'⚠️ Vencendo'},{k:'trial_vencido',l:'⛔ Vencidos'},
+    {k:'premium_all',l:'👑 Premium'},{k:'inativo',l:'💤 Inativos'}
+  ];
+  document.getElementById('tabsRow').innerHTML = tabs.map(t=>
+    `<button class="tab${currentFilter===t.k?' active':''}" onclick="currentFilter='${t.k}';renderTabs();renderList()">${t.l}${counts[t.k]>0?' ('+counts[t.k]+')':''}</button>`
+  ).join('');
+}
+
+function renderList() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const sort = document.getElementById('sortSelect').value;
+  
+  let list = users.map(u=>({...u,cl:classify(u),eng:engScore(u)}));
+  
+  if(currentFilter==='premium_all') list=list.filter(u=>['premium','renovacao','plano_vencido'].includes(u.cl.s));
+  else if(currentFilter!=='todos') list=list.filter(u=>u.cl.s===currentFilter);
+  
+  if(search) list=list.filter(u=>u.nome.toLowerCase().includes(search)||u.email.toLowerCase().includes(search));
+  
+  if(sort==='recent') list.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  if(sort==='engagement') list.sort((a,b)=>b.eng-a.eng);
+  if(sort==='revenue') list.sort((a,b)=>b.receita_total-a.receita_total);
+  if(sort==='expiry') list.sort((a,b)=>{
+    const da=a.plano_fim||a.trial_expira_em||'2099-01-01';
+    const db=b.plano_fim||b.trial_expira_em||'2099-01-01';
+    return new Date(da)-new Date(db);
+  });
+  
+  if(!list.length){ document.getElementById('userList').innerHTML='<div class="empty">Nenhuma vendedora neste filtro.</div>';return; }
+  
+  document.getElementById('userList').innerHTML = list.map(u=>{
+    const venc = dFrom(u.plano_fim) ?? dFrom(u.trial_expira_em);
+    const isPrem = u.plano_liberado==='premium'&&u.pagamento_confirmado;
+    const ec = u.eng>=70?'#10b981':u.eng>=40?'#f59e0b':u.eng>=10?'#f97316':'#d4d4d4';
+    const vc = venc!==null?(venc<=0?'var(--red)':venc<=5?'var(--amber)':'var(--green)'):'';
+    return `
+    <div class="user-card">
+      <div class="top">
+        <div>
+          <div class="name">${u.nome}</div>
+          <div class="email">${u.email}</div>
+        </div>
+        <span style="font-size:20px">${isPrem?'👑':'🆓'}</span>
+      </div>
+      <div class="badges">
+        <span class="badge" style="color:${u.cl.c};background:${u.cl.bg}">${u.cl.i} ${u.cl.l}</span>
+        ${isPrem?'<span class="badge" style="color:#059669;background:#ecfdf5">💰 Pago</span>':''}
+        ${venc!==null?`<span class="badge" style="color:${vc};background:#f5f5f4">${venc<=0?Math.abs(venc)+'d atrás':venc+'d'}</span>`:''}
+      </div>
+      <div class="row">
+        <div class="metric"><div class="v">${u.total_vendas}</div><div class="l">Vendas</div></div>
+        <div class="metric"><div class="v">${u.total_clientes}</div><div class="l">Clientes</div></div>
+        <div class="metric"><div class="v">${u.total_produtos}</div><div class="l">Produtos</div></div>
+        <div class="metric"><div class="v">${fmtCur(u.receita_total)}</div><div class="l">Receita</div></div>
+        <div class="eng-bar"><div class="track"><div class="fill" style="width:${u.eng}%;background:${ec}"></div></div><span>${u.eng}</span></div>
+      </div>
+      <div class="actions">
+        <button style="background:var(--wine);color:#fff" onclick="event.stopPropagation();openPlanModal('${u.id}')">👑 Plano</button>
+        <button style="background:#25D366;color:#fff" onclick="event.stopPropagation();openMsgModal('${u.id}')">💬 WhatsApp</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// PLAN MODAL
+// ═══════════════════════════════════════════
+function openPlanModal(userId) {
+  const u = users.find(x=>x.id===userId);
+  if(!u) return;
+  currentPlanUser = u;
+  const isPrem = u.plano_liberado==='premium'&&u.pagamento_confirmado;
+  
+  document.getElementById('planModalLabel').textContent = isPrem?'Renovar / Gerenciar':'Liberar Plano';
+  document.getElementById('planModalName').textContent = u.nome;
+  document.getElementById('planModalEmail').textContent = u.email;
+  
+  const body = document.getElementById('planModalBody');
+  body.innerHTML = `
+    <div class="section-label">Selecionar Plano</div>
+    <div class="plan-cards">
+      <div class="plan-card" id="pc-gratuito" onclick="selectPlan('gratuito')">
+        <div class="ic">🆓</div><div class="nm">Gratuito</div>
+        <div class="pr" style="color:#78716c">R$ 0</div>
+        <div class="lim">3 clientes · 10 vendas</div>
+      </div>
+      <div class="plan-card selected" id="pc-premium" onclick="selectPlan('premium')">
+        <div style="background:#7c1d3e;color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:8px;display:inline-block;margin-bottom:4px">RECOMENDADO</div>
+        <div class="ic">👑</div><div class="nm">Premium</div>
+        <div class="pr" style="color:#7c1d3e">R$ 29,90<span style="font-size:10px;font-weight:500">/mês</span></div>
+        <div class="lim">Tudo ilimitado</div>
+      </div>
+    </div>
+    
+    <div id="premiumFields">
+      <div class="section-label">Duração</div>
+      <div class="duration-row">
+        <button class="dur-btn active" onclick="selectDur(this,'30')">30 dias</button>
+        <button class="dur-btn" onclick="selectDur(this,'90')">3 meses</button>
+        <button class="dur-btn" onclick="selectDur(this,'180')">6 meses</button>
+        <button class="dur-btn" onclick="selectDur(this,'365')">1 ano</button>
+      </div>
+      
+      <div class="section-label">💰 Pagamento</div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:var(--muted);font-weight:600">Valor</label>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+          <span style="font-weight:700;color:var(--muted)">R$</span>
+          <input type="number" step="0.01" id="planValue" placeholder="29.90" style="padding:10px;border-radius:10px;border:1px solid var(--border);width:120px;font-size:14px;outline:none">
+        </div>
+      </div>
+      
+      <label style="font-size:11px;color:var(--muted);font-weight:600">Método</label>
+      <div class="pay-methods">
+        <button class="pay-btn active" onclick="selectPay(this,'pix')">📱 PIX</button>
+        <button class="pay-btn" onclick="selectPay(this,'transferencia')">🏦 Transf.</button>
+        <button class="pay-btn" onclick="selectPay(this,'dinheiro')">💵 Dinheiro</button>
+      </div>
+      
+      <button class="confirm-pay" id="confirmPayBtn" onclick="togglePayConfirm()">
+        <span class="check">⬜</span>
+        <div class="txt">
+          <div class="title" style="color:#78716c">Confirmar Recebimento</div>
+          <div class="desc">Clique ao receber o pagamento</div>
+        </div>
+      </button>
+    </div>
+    
+    <div class="section-label">📝 Notas Admin</div>
+    <textarea class="notes-input" id="planNotes" placeholder="Observações...">${u.notas_admin||''}</textarea>
+    
+    <button class="action-btn" id="savePlanBtn" style="background:var(--amber);color:#fff;margin-top:16px" onclick="doSavePlan()">
+      ⏳ Salvar Pendente
+    </button>
+    <button class="action-btn" style="background:#e7e5e4;color:#78716c" onclick="closePlanModal()">Cancelar</button>
+  `;
+  
+  // State
+  window._planState = { plan:'premium', duration:'30', payMethod:'pix', confirmed:false };
+  
+  document.getElementById('planModal').classList.remove('hide');
+  document.body.style.overflow='hidden';
+}
+
+function selectPlan(p) {
+  window._planState.plan = p;
+  document.querySelectorAll('.plan-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('pc-'+p).classList.add('selected');
+  document.getElementById('premiumFields').style.display = p==='premium'?'block':'none';
+  updateSaveBtn();
+}
+
+function selectDur(btn,v) {
+  window._planState.duration = v;
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function selectPay(btn,v) {
+  window._planState.payMethod = v;
+  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function togglePayConfirm() {
+  window._planState.confirmed = !window._planState.confirmed;
+  const btn = document.getElementById('confirmPayBtn');
+  const c = window._planState.confirmed;
+  btn.className = 'confirm-pay'+(c?' confirmed':'');
+  btn.querySelector('.check').textContent = c?'✅':'⬜';
+  btn.querySelector('.title').textContent = c?'Pagamento Confirmado!':'Confirmar Recebimento';
+  btn.querySelector('.title').style.color = c?'#065f46':'#78716c';
+  const val = document.getElementById('planValue').value || '29.90';
+  const pm = PAY_METHODS.find(m=>m.key===window._planState.payMethod);
+  btn.querySelector('.desc').textContent = c?`R$ ${val} via ${pm?.label}`:'Clique ao receber o pagamento';
+  updateSaveBtn();
+}
+
+function updateSaveBtn() {
+  const btn = document.getElementById('savePlanBtn');
+  const {plan,confirmed} = window._planState;
+  if(plan==='gratuito'){
+    btn.style.background='#78716c';btn.textContent='🆓 Rebaixar para Gratuito';
+  } else if(confirmed){
+    btn.style.background='var(--green)';btn.textContent='👑 Liberar Premium';
+  } else {
+    btn.style.background='var(--amber)';btn.textContent='⏳ Salvar Pendente';
+  }
+}
+
+async function doSavePlan() {
+  const u = currentPlanUser;
+  if(!u) return;
+  const {plan,duration,payMethod,confirmed} = window._planState;
+  const val = parseFloat(document.getElementById('planValue')?.value) || (plan==='premium'?29.9:0);
+  const notes = document.getElementById('planNotes')?.value||'';
+  const start = new Date();
+  const end = new Date(); end.setDate(end.getDate()+parseInt(duration));
+  
+  const btn = document.getElementById('savePlanBtn');
+  btn.innerHTML='<span class="spinner"></span> Salvando...';
+  btn.disabled=true;
+  
+  const ok = await savePlan(u.id, {
+    plano_liberado: plan,
+    plano_valor: plan==='premium'?val:0,
+    plano_inicio: plan==='premium'?start.toISOString():null,
+    plano_fim: plan==='premium'?end.toISOString():null,
+    pagamento_confirmado: plan==='premium'?confirmed:false,
+    pagamento_metodo: payMethod,
+    notas_admin: notes
+  });
+  
+  if(ok) {
+    document.getElementById('planModalBody').innerHTML = `
+      <div style="text-align:center;padding:30px 0">
+        <div style="font-size:48px;margin-bottom:10px">${plan==='premium'?(confirmed?'👑':'⏳'):'🆓'}</div>
+        <h3 style="font-size:18px;font-weight:800;color:${plan==='premium'&&confirmed?'var(--wine)':'#78716c'}">${plan==='premium'?(confirmed?'Premium Liberado!':'Salvo como Pendente'):'Rebaixado para Gratuito'}</h3>
+        <p style="color:var(--muted);font-size:13px;margin-top:6px">${u.nome}</p>
+        <button class="action-btn" style="background:var(--wine);color:#fff;margin-top:20px" onclick="closePlanModal()">✅ Fechar</button>
+      </div>
+    `;
+  } else {
+    btn.innerHTML = 'Tentar novamente';
+    btn.disabled = false;
+  }
+}
+
+function closePlanModal() {
+  document.getElementById('planModal').classList.add('hide');
+  document.body.style.overflow='';
+  currentPlanUser = null;
+}
+
+// ═══════════════════════════════════════════
+// MESSAGE MODAL
+// ═══════════════════════════════════════════
+function openMsgModal(userId) {
+  const u = users.find(x=>x.id===userId);
+  if(!u) return;
+  const cl = classify(u);
+  const dT = dFrom(u.trial_expira_em);
+  const dP = dFrom(u.plano_fim);
+  
+  let def = 'trial_feedback';
+  if(cl.s==='novo') def='welcome';
+  if(cl.s==='trial_vencendo') def='trial_vencendo';
+  if(cl.s==='trial_vencido') def='trial_vencido';
+  if(cl.s==='inativo') def='reengajar';
+  if(cl.s==='premium') def='premium_ativado';
+  if(cl.s==='renovacao') def='renovacao';
+  if(cl.s==='plano_vencido') def='plano_vencido';
+  
+  document.getElementById('msgModalName').textContent = '💬 '+u.nome;
+  document.getElementById('msgModalPhone').textContent = u.telefone||'Sem telefone';
+  
+  const n = u.nome.split(' ')[0];
+  const body = document.getElementById('msgModalBody');
+  body.innerHTML = `
+    <div class="tpl-row">
+      ${TPL_LIST.map(t=>`<button class="tpl-btn${t.k===def?' active':''}" onclick="changeTpl(this,'${t.k}','${u.id}')">${t.l}</button>`).join('')}
+    </div>
+    <textarea class="msg-area" id="msgText"></textarea>
+    <div style="display:flex;gap:8px;margin-top:14px" id="msgActions">
+      ${u.telefone?`<a href="https://wa.me/${fPhone(u.telefone)}?text=" target="_blank" id="waLink" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;background:#25D366;color:#fff;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none" onclick="this.href='https://wa.me/${fPhone(u.telefone)}?text='+encodeURIComponent(document.getElementById('msgText').value)">📲 WhatsApp</a>`
+      :`<div style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;background:#d6d3d1;color:#78716c;border-radius:12px;font-size:14px;font-weight:700">📵 Sem telefone</div>`}
+      <button style="padding:12px 16px;background:#e7e5e4;color:#57534e;border-radius:12px;font-size:14px;font-weight:700" onclick="navigator.clipboard.writeText(document.getElementById('msgText').value);this.textContent='✅'">📋</button>
+    </div>
+  `;
+  
+  // Set initial message
+  changeTpl(null, def, u.id);
+  
+  document.getElementById('msgModal').classList.remove('hide');
+  document.body.style.overflow='hidden';
+}
+
+function changeTpl(btn, tplKey, userId) {
+  const u = users.find(x=>x.id===userId);
+  if(!u) return;
+  const n = u.nome.split(' ')[0];
+  const dT = dFrom(u.trial_expira_em);
+  const dP = dFrom(u.plano_fim);
+  const fn = TPL[tplKey];
+  let msg = '';
+  if(tplKey==='trial_vencendo') msg=fn(n,dT);
+  else if(tplKey==='renovacao') msg=fn(n,dP);
+  else msg=fn(n);
+  document.getElementById('msgText').value = msg;
+  
+  if(btn) {
+    document.querySelectorAll('.tpl-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+function closeMsgModal() {
+  document.getElementById('msgModal').classList.add('hide');
+  document.body.style.overflow='';
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+try {
+  const savedUrl = localStorage.getItem('crm_url');
+  const savedKey = localStorage.getItem('crm_key');
+  if(savedUrl) document.getElementById('inputUrl').value = savedUrl;
+  if(savedKey) document.getElementById('inputKey').value = savedKey;
+} catch(e){}
+
+// Enter key on PIN
+document.getElementById('inputPin').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>
