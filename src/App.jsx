@@ -308,7 +308,8 @@ body {
 .whatsapp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; max-width: 1100px; margin: 0 auto; }
 .whatsapp-content h2 {
   font-family: 'Syne', sans-serif; font-weight: 800;
-  font-size: clamp(1.8rem, 3vw, 2.4rem); margin-bottom: 16px; line-height: 1.15;
+  font-size: clamp(1.6rem, 6.5vw, 2.4rem); margin-bottom: 16px; line-height: 1.2;
+  word-break: normal; overflow-wrap: normal;
 }
 .whatsapp-content h2 span { color: var(--accent); }
 .whatsapp-content p { color: rgba(255,255,255,.7); font-size: 1.05rem; line-height: 1.6; margin-bottom: 28px; }
