@@ -534,15 +534,20 @@ body {
 }
 
 @media (max-width: 480px) {
-  .hero-title { font-size: clamp(1.8rem, 10vw, 2.4rem); }
-  .section-title { font-size: clamp(1.6rem, 8vw, 2.2rem); margin-bottom: 20px; }
-  .section-subtitle { font-size: 0.95rem; margin-bottom: 40px; padding: 0 10px; }
-  .pain-card { padding: 24px 16px; }
-  .step-card h3 { font-size: 1.05rem; }
-  .feature-card { padding: 20px 16px; }
-  .whatsapp-content h2 { font-size: clamp(1.4rem, 8vw, 2rem); }
-  .cta-section h2 { font-size: clamp(1.6rem, 8vw, 2.2rem); }
-  .pain-card p, .step-card p, .feature-card p, .whatsapp-content p, .testimonial-text { font-size: 0.9rem; }
+  .hero-grid { padding: 0; width: 100%; max-width: 100%; }
+  .hero-title { font-size: clamp(1.8rem, 8vw, 2.2rem); }
+  .section-title { font-size: clamp(1.5rem, 7vw, 2rem); margin-bottom: 16px; width: 100%; }
+  .section-subtitle { font-size: clamp(0.85rem, 4vw, 1rem); margin-bottom: 32px; padding: 0 10px; width: 100%; }
+  .pain-grid, .steps-grid, .features-grid, .testimonials-grid, .pricing-grid { width: 100%; }
+  .pain-card { padding: 20px 14px; width: 100%; }
+  .step-card { width: 100%; }
+  .step-card h3 { font-size: clamp(1rem, 5vw, 1.15rem); }
+  .feature-card { padding: 16px 12px; width: 100%; }
+  .whatsapp-content h2 { font-size: clamp(1.4rem, 7vw, 1.8rem); width: 100%; }
+  .cta-section h2 { font-size: clamp(1.5rem, 7vw, 2rem); width: 100%; }
+  .pain-card p, .step-card p, .feature-card p, .whatsapp-content p, .testimonial-text { 
+    font-size: clamp(0.85rem, 4vw, 0.95rem); 
+  }
 }
 `;
 
