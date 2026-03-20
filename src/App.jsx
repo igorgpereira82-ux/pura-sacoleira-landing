@@ -98,6 +98,7 @@ body {
 }
 .nav.scrolled { box-shadow: 0 2px 20px rgba(139,26,74,.12); }
 .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.25rem; color: var(--wine); display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.nav-logo-img { height: 36px; width: auto; object-fit: contain; }
 .nav-links { display: flex; gap: 28px; align-items: center; }
 .nav-links a { font-size: .9rem; color: var(--text-secondary); text-decoration: none; font-weight: 500; transition: color .2s; }
 .nav-links a:hover { color: var(--wine); }
@@ -170,12 +171,15 @@ body {
 .btn-secondary:hover { background: var(--pink-soft); border-color: var(--wine); }
 .hero-social-proof { display: flex; align-items: center; gap: 12px; }
 .hero-avatars { display: flex; }
-.hero-avatars span {
-  width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  font-size: .9rem; margin-left: -8px; border: 2px solid #fff;
-  background: linear-gradient(135deg, var(--wine), var(--accent));
+.hero-avatars img {
+  width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+  margin-left: -12px; border: 2.5px solid #fff;
+  background: var(--pink-light);
+  box-shadow: 0 4px 10px rgba(139,26,74,.15);
+  transition: transform .2s;
 }
-.hero-avatars span:first-child { margin-left: 0; }
+.hero-avatars img:hover { transform: translateY(-3px) scale(1.05); z-index: 10; position: relative; }
+.hero-avatars img:first-child { margin-left: 0; }
 .hero-social-text { font-size: .85rem; color: var(--text-secondary); line-height: 1.4; }
 .hero-social-text strong { color: var(--text); }
 
@@ -189,6 +193,12 @@ body {
   padding: 12px; position: relative;
   box-shadow: 0 20px 60px rgba(139,26,74,.25), 0 0 0 2px rgba(139,26,74,.1);
   animation: phoneFloat 4s ease-in-out infinite;
+}
+.hero-app-screenshot {
+  width: 100%; max-width: 300px; border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(139,26,74,.25), 0 0 0 2px rgba(139,26,74,.1);
+  animation: phoneFloat 4s ease-in-out infinite;
+  object-fit: contain;
 }
 @keyframes phoneFloat {
   0%, 100% { transform: translateY(0px); }
@@ -370,9 +380,10 @@ body {
 .testimonial-author { display: flex; align-items: center; gap: 12px; }
 .testimonial-avatar {
   width: 44px; height: 44px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--pink-light), var(--accent));
-  display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; border: 2px solid var(--border-pink);
 }
+.testimonial-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .testimonial-name { font-weight: 600; font-size: .9rem; }
 .testimonial-role { font-size: .8rem; color: var(--text-secondary); }
 
@@ -525,7 +536,7 @@ body {
   .pricing-card.featured { transform: scale(1); }
 }
 @media (max-width: 600px) {
-  .hero { padding: 100px 5% 60px; }
+  .hero { padding: 80px 5% 40px; min-height: auto; }
   .pain-grid, .features-grid, .testimonials-grid, .pricing-grid { grid-template-columns: 1fr; }
   .footer-content { flex-direction: column; text-align: center; }
   .footer-grid { grid-template-columns: 1fr; text-align: center; }
@@ -534,8 +545,13 @@ body {
 }
 
 @media (max-width: 480px) {
-  .hero-grid { padding: 0; width: 100%; max-width: 100%; }
-  .hero-title { font-size: clamp(1.8rem, 8vw, 2.2rem); }
+  .hero { padding: 75px 5% 30px; }
+  .hero-grid { padding: 0; width: 100%; max-width: 100%; gap: 30px; }
+  .hero-badge { margin-bottom: 16px; }
+  .hero-title { font-size: clamp(1.8rem, 8vw, 2.2rem); margin-bottom: 8px; }
+  .hero-subtitle { font-size: clamp(0.9rem, 4vw, 1rem); margin-bottom: 24px; padding: 0 10px; width: 100%; }
+  .hero-buttons { margin-bottom: 30px; }
+  .hero-app-screenshot { max-width: 240px; }
   .section-title { font-size: clamp(1.5rem, 7vw, 2rem); margin-bottom: 16px; width: 100%; }
   .section-subtitle { font-size: clamp(0.85rem, 4vw, 1rem); margin-bottom: 32px; padding: 0 10px; width: 100%; }
   .pain-grid, .steps-grid, .features-grid, .testimonials-grid, .pricing-grid { width: 100%; }
@@ -577,9 +593,9 @@ const features = [
 ];
 
 const testimonials = [
-  { name: "Maria Silva", role: "Revendedora há 8 anos", text: "Eu perdia tudo no caderninho. Agora tenho controle de cada cliente, cada parcela. Já recuperei dinheiro que achei que tinha perdido!", stars: 5, avatar: "👩🏽" },
-  { name: "Ana Santos", role: "Sacoleira autônoma", text: "A cobrança pelo WhatsApp é um sonho. Minhas clientes pagam em dia agora, sem eu precisar ficar ligando uma por uma.", stars: 5, avatar: "👩🏻" },
-  { name: "Joana Oliveira", role: "Revendedora de moda", text: "O app é tão fácil de usar que em 5 minutos eu já tava cadastrando minhas clientes. Recomendo pra toda sacoleira!", stars: 5, avatar: "👩🏾" },
+  { name: "Maria Silva", role: "Revendedora há 8 anos", text: "Eu perdia tudo no caderninho. Agora tenho controle de cada cliente, cada parcela. Já recuperei dinheiro que achei que tinha perdido!", stars: 5, avatar: "https://randomuser.me/api/portraits/women/44.jpg" },
+  { name: "Ana Santos", role: "Sacoleira autônoma", text: "A cobrança pelo WhatsApp é um sonho. Minhas clientes pagam em dia agora, sem eu precisar ficar ligando uma por uma.", stars: 5, avatar: "https://randomuser.me/api/portraits/women/68.jpg" },
+  { name: "Joana Oliveira", role: "Revendedora de moda", text: "O app é tão fácil de usar que em 5 minutos eu já tava cadastrando minhas clientes. Recomendo pra toda sacoleira!", stars: 5, avatar: "https://randomuser.me/api/portraits/women/32.jpg" },
 ];
 
 const faqs = [
@@ -631,12 +647,14 @@ export default function LandingPage() {
 
       {/* NAV */}
       <nav className={`nav ${scrolled ? "scrolled" : ""}`}>
-        <a href="#" className="nav-logo">🛍️ Pura Sacoleira</a>
+        <a href="#" className="nav-logo">
+          <img src="/logo.png" alt="Pura Sacoleira" className="nav-logo-img" />
+        </a>
         <div className="nav-links">
           <a href="#funcionalidades">Funcionalidades</a>
           <a href="#planos">Planos</a>
           <a href="#faq">FAQ</a>
-          <a href={APP_LINK} className="nav-cta" target="_blank" rel="noopener">Teste Grátis</a>
+          <a href={APP_LINK} className="nav-cta" target="_blank" rel="noopener" onClick={() => window.fbq && window.fbq('track', 'Lead')}>Teste Grátis</a>
         </div>
         <button className="hamburger" onClick={() => window.open(APP_LINK, '_blank')}>☰</button>
       </nav>
@@ -655,16 +673,19 @@ export default function LandingPage() {
               Controle vendas, fiado e cobranças na palma da mão.
             </p>
             <div className="hero-buttons">
-              <a href={APP_LINK} className="btn-primary" target="_blank" rel="noopener">
+              <a href={APP_LINK} className="btn-primary" target="_blank" rel="noopener" onClick={() => window.fbq && window.fbq('track', 'Lead')}>
                 Começar Grátis →
               </a>
               <a href="#funcionalidades" className="btn-secondary">
                 Ver funcionalidades
               </a>
             </div>
-            <div className="hero-social-proof">
+              <div className="hero-social-proof">
               <div className="hero-avatars">
-                <span>👩🏽</span><span>👩🏻</span><span>👩🏾</span><span>👩🏿</span>
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User 1" />
+                <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="User 2" />
+                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User 3" />
+                <img src="https://randomuser.me/api/portraits/women/79.jpg" alt="User 4" />
               </div>
               <div className="hero-social-text">
                 <strong>+500 sacoleiras</strong> já organizam<br />suas vendas com o app
@@ -673,37 +694,7 @@ export default function LandingPage() {
           </div>
           <div className="hero-phone">
             <div className="phone-glow" />
-            <div className="phone-frame">
-              <div className="phone-screen">
-                <div className="phone-header">
-                  <div className="phone-header-top">Pura Sacoleira</div>
-                  <h3>Olá, Empreendedora! 👋</h3>
-                  <p>Suas vendas de hoje</p>
-                </div>
-                <div className="phone-body">
-                  <div className="phone-card">
-                    <div className="phone-card-icon">💰</div>
-                    <div className="phone-card-info"><h4>Vendas Hoje</h4><p>12 vendas realizadas</p></div>
-                    <div className="phone-card-value">R$ 847</div>
-                  </div>
-                  <div className="phone-card">
-                    <div className="phone-card-icon">📒</div>
-                    <div className="phone-card-info"><h4>Fiado Pendente</h4><p>8 clientes devendo</p></div>
-                    <div className="phone-card-value">R$ 1.250</div>
-                  </div>
-                  <div className="phone-card">
-                    <div className="phone-card-icon">📦</div>
-                    <div className="phone-card-info"><h4>Estoque</h4><p>3 produtos com alerta</p></div>
-                    <div className="phone-card-value">⚠️</div>
-                  </div>
-                  <div className="phone-card">
-                    <div className="phone-card-icon">📊</div>
-                    <div className="phone-card-info"><h4>Meta do Mês</h4><p>R$ 3.200 de R$ 5.000</p></div>
-                    <div className="phone-card-value">64%</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <img src="/app-screenshot.jpg" alt="Pura Sacoleira App" className="hero-app-screenshot" />
           </div>
         </div>
       </div>
@@ -848,7 +839,7 @@ export default function LandingPage() {
                 <div className="testimonial-stars">{"⭐".repeat(t.stars)}</div>
                 <p className="testimonial-text">"{t.text}"</p>
                 <div className="testimonial-author">
-                  <div className="testimonial-avatar">{t.avatar}</div>
+                  <div className="testimonial-avatar"><img src={t.avatar} alt={t.name} /></div>
                   <div>
                     <div className="testimonial-name">{t.name}</div>
                     <div className="testimonial-role">{t.role}</div>
@@ -880,7 +871,7 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <a href={APP_LINK} className="btn-secondary" target="_blank" rel="noopener" style={{ width: "100%", justifyContent: "center" }}>
+              <a href={APP_LINK} className="btn-secondary" target="_blank" rel="noopener" style={{ width: "100%", justifyContent: "center" }} onClick={() => window.fbq && window.fbq('track', 'Lead')}>
                 Começar Grátis
               </a>
             </div>
@@ -896,7 +887,7 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <a href={APP_LINK} className="btn-primary" target="_blank" rel="noopener" style={{ width: "100%", justifyContent: "center" }}>
+              <a href={APP_LINK} className="btn-primary" target="_blank" rel="noopener" style={{ width: "100%", justifyContent: "center" }} onClick={() => window.fbq && window.fbq('track', 'Lead')}>
                 Teste Grátis por 14 dias →
               </a>
             </div>
@@ -931,11 +922,12 @@ export default function LandingPage() {
         <h2>De sacoleira a empresária.<br />Comece agora.</h2>
         <p>14 dias grátis. Sem cartão. Sem compromisso. Só organização.</p>
         <div className="cta-buttons">
-          <a href={APP_LINK} className="btn-white" target="_blank" rel="noopener">
-            🛍️ Começar Grátis Agora
+          <a href={APP_LINK} className="btn-white" target="_blank" rel="noopener" onClick={() => window.fbq && window.fbq('track', 'Lead')}>
+            <img src="/logo.png" alt="Logo" style={{ height: "20px", marginRight: "8px" }} /> Começar Grátis Agora
           </a>
           <a href={WHATSAPP_LINK} className="btn-outline-white" target="_blank" rel="noopener">
-            💬 Falar no WhatsApp
+            <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '8px' }}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a5.8 5.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+            Falar no WhatsApp
           </a>
         </div>
       </div>
@@ -954,7 +946,7 @@ export default function LandingPage() {
       <footer className="footer">
         <div className="footer-grid">
           <div>
-            <div className="footer-logo">🛍️ Pura Sacoleira</div>
+            <div className="footer-logo"><img src="/logo.png" alt="Pura Sacoleira" style={{height:'28px',width:'auto',borderRadius:'6px',verticalAlign:'middle',marginRight:'8px'}} />Pura Sacoleira</div>
             <p className="footer-desc">O app que transforma sacoleira em empresária. Controle vendas, fiado e cobranças de forma profissional.</p>
             <p className="footer-domain">purasacoleira.com.br</p>
           </div>
@@ -964,13 +956,16 @@ export default function LandingPage() {
               <a href="#funcionalidades">Funcionalidades</a>
               <a href="#planos">Planos</a>
               <a href="#faq">Dúvidas Frequentes</a>
-              <a href={APP_LINK} target="_blank" rel="noopener">Acessar o App</a>
+              <a href={APP_LINK} target="_blank" rel="noopener" onClick={() => window.fbq && window.fbq('track', 'Lead')}>Acessar o App</a>
             </div>
           </div>
           <div>
             <div className="footer-heading">Contato</div>
             <div className="footer-nav-links">
-              <a href={WHATSAPP_LINK} target="_blank" rel="noopener">💬 WhatsApp: (73) 9912-3452</a>
+              <a href={WHATSAPP_LINK} target="_blank" rel="noopener" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a5.8 5.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                WhatsApp: (73) 9912-3452
+              </a>
               <a href="mailto:contato@purasacoleira.com.br">📧 contato@purasacoleira.com.br</a>
             </div>
             <div className="social-icons-container" style={{ display: "flex", gap: "16px", marginTop: "24px" }}>
@@ -989,8 +984,8 @@ export default function LandingPage() {
       </footer>
 
       {/* WHATSAPP FAB */}
-      <a href={WHATSAPP_LINK} className="whatsapp-fab" target="_blank" rel="noopener" title="Fale conosco no WhatsApp">
-        💬
+      <a href={WHATSAPP_LINK} className="whatsapp-fab" target="_blank" rel="noopener" title="Fale conosco no WhatsApp" onClick={() => window.fbq && window.fbq('track', 'Contact')}>
+        <svg fill="#ffffff" viewBox="0 0 24 24" width="34" height="34" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a5.8 5.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
       </a>
     </>
   );
