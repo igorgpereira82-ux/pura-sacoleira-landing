@@ -109,6 +109,7 @@ body {
   transition: transform .2s, box-shadow .2s;
 }
 .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139,26,74,.35); }
+.nav-cta-mobile { display: none !important; }
 .hamburger { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--wine); }
 
 /* ─── HERO ─── */
@@ -523,7 +524,7 @@ body {
   .hero-subtitle { margin-left: auto; margin-right: auto; }
   .hero-buttons { justify-content: center; }
   .hero-social-proof { justify-content: center; }
-  .hero-phone { order: -1; margin-bottom: 20px; }
+  .hero-phone { margin-bottom: 20px; }
   .phone-frame { width: 220px; height: 440px; }
   .steps-grid { grid-template-columns: 1fr; }
   .steps-grid::before { display: none; }
@@ -532,6 +533,7 @@ body {
   .whatsapp-mockup { order: -1; margin-bottom: 20px; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .nav-links { display: none; }
+  .nav-cta-mobile { display: inline-flex !important; padding: 8px 16px !important; font-size: 0.8rem !important; margin-right: 12px; }
   .hamburger { display: block; }
   .pricing-card.featured { transform: scale(1); }
 }
@@ -648,7 +650,7 @@ export default function LandingPage() {
       {/* NAV */}
       <nav className={`nav ${scrolled ? "scrolled" : ""}`}>
         <a href="#" className="nav-logo">
-          <img src="/logo.png" alt="Pura Sacoleira" className="nav-logo-img" />
+          <img src="/logo.png" alt="Pura Sacoleira" style={{height:'36px', width:'auto', borderRadius:'8px', marginRight:'8px'}} /> Pura Sacoleira
         </a>
         <div className="nav-links">
           <a href="#funcionalidades">Funcionalidades</a>
@@ -656,7 +658,10 @@ export default function LandingPage() {
           <a href="#faq">FAQ</a>
           <a href={APP_LINK} className="nav-cta" target="_blank" rel="noopener" onClick={() => window.fbq && window.fbq('track', 'Lead')}>Teste Grátis</a>
         </div>
-        <button className="hamburger" onClick={() => window.open(APP_LINK, '_blank')}>☰</button>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <a href={APP_LINK} className="nav-cta nav-cta-mobile" target="_blank" rel="noopener" onClick={() => window.fbq && window.fbq('track', 'Lead')}>Teste Grátis</a>
+          <button className="hamburger" onClick={() => window.open(APP_LINK, '_blank')}>☰</button>
+        </div>
       </nav>
 
       {/* HERO */}
